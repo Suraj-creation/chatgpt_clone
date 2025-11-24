@@ -1,10 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { Message } from '@/lib/types';
 
-const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
+// Check both server-side and client-side environment variables
+const GEMINI_API_KEY = 
+  process.env.GEMINI_API_KEY || 
+  process.env.NEXT_PUBLIC_GEMINI_API_KEY;
 
 if (!GEMINI_API_KEY) {
   console.error('⚠️ GEMINI_API_KEY is not set in environment variables');
+  console.error('📋 Available env vars:', Object.keys(process.env).filter(k => k.includes('GEMINI') || k.includes('API')));
 }
 
 interface RequestBody {

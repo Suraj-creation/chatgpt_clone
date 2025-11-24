@@ -339,6 +339,22 @@ Having issues? Here's how to get help:
 ### Code Highlighting
 ![Code Screenshot](https://via.placeholder.com/800x450.png?text=Code+Highlighting)
 
+## 🚀 Deployment
+
+### Deploy to Vercel
+
+The easiest way to deploy your Next.js app is to use the Vercel Platform.
+
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/Suraj-creation/chatgpt_clone)
+
+**Important**: After deploying, you MUST add your environment variable:
+1. Go to your Vercel Dashboard
+2. Navigate to: Settings → Environment Variables
+3. Add: `GEMINI_API_KEY` with your API key
+4. Redeploy the application
+
+For detailed deployment instructions, see [DEPLOYMENT.md](./DEPLOYMENT.md)
+
 ---
 
 Made with ❤️ using Google Gemini API
