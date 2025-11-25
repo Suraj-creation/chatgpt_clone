@@ -18,6 +18,8 @@ export default function Home() {
     systemPrompt,
     isStreaming,
     isSidebarOpen,
+    messageDensity,
+    messageWidth,
     createConversation,
     deleteConversation,
     loadConversation,
@@ -143,7 +145,7 @@ export default function Home() {
   };
 
   return (
-    <main className="flex h-screen overflow-hidden bg-bg-primary">
+    <main className={`flex h-screen overflow-hidden bg-bg-primary ${'density-' + messageDensity}`}> 
       {/* Sidebar */}
       <Sidebar
         conversations={conversations}
@@ -157,7 +159,7 @@ export default function Home() {
       />
 
       {/* Main Chat Area */}
-      <div className="flex-1 flex flex-col overflow-hidden">
+      <div className="flex-1 flex flex-col overflow-hidden items-center">
         {/* System Prompt Editor */}
         <SystemPromptEditor
           systemPrompt={systemPrompt}
@@ -168,7 +170,9 @@ export default function Home() {
         <ChatHeader />
 
         {/* Messages */}
-        <MessageList />
+        <div style={{ ['--message-width' as any]: messageWidth }} className="message-container w-full flex-1 flex flex-col">
+          <MessageList />
+        </div>
 
         {/* Input Area */}
         <ChatInput

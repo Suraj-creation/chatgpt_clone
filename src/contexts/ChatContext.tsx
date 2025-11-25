@@ -22,6 +22,11 @@ interface ChatContextType extends ChatState {
   toggleSidebar: () => void;
   clearAllConversations: () => void;
   getActiveConversation: () => Conversation | null;
+  setTheme: (theme: 'dark' | 'light') => void;
+  setFontScale: (scale: number) => void;
+  setMessageWidth: (width: number) => void;
+  setSidebarWidth: (width: number) => void;
+  setMessageDensity: (density: 'comfortable' | 'compact') => void;
 }
 
 const ChatContext = createContext<ChatContextType | undefined>(undefined);
@@ -34,7 +39,7 @@ export const useChatContext = () => {
   return context;
 };
 
-export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children }: { children: React.ReactNode }) => {
   const [state, setState] = useState<ChatState>({
     conversations: [],
     activeConversationId: null,
@@ -42,6 +47,11 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
     systemPrompt: 'You are a helpful AI assistant. Answer clearly and concisely.',
     isStreaming: false,
     isSidebarOpen: true,
+    theme: 'dark',
+    fontScale: 1,
+    messageWidth: 760,
+    sidebarWidth: 320,
+    messageDensity: 'comfortable',
   });
 
   // Load initial state from localStorage
@@ -51,6 +61,11 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const currentModel = storage.loadCurrentModel();
     const systemPrompt = storage.loadSystemPrompt();
     const isSidebarOpen = storage.loadSidebarState();
+    const theme = storage.loadTheme();
+    const fontScale = storage.loadFontScale();
+    const messageWidth = storage.loadMessageWidth();
+    const sidebarWidth = storage.loadSidebarWidth();
+    const messageDensity = storage.loadMessageDensity();
 
     setState({
       conversations,
@@ -59,6 +74,11 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
       systemPrompt,
       isStreaming: false,
       isSidebarOpen,
+      theme,
+      fontScale,
+      messageWidth,
+      sidebarWidth,
+      messageDensity,
     });
   }, []);
 
@@ -72,7 +92,7 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
   // Create new conversation
   const createConversation = useCallback(() => {
     const newConv = createNewConversation();
-    setState(prev => ({
+    setState((prev: ChatState) => ({
       ...prev,
       conversations: [newConv, ...prev.conversations],
       activeConversationId: newConv.id,
@@ -82,8 +102,8 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   // Delete conversation
   const deleteConversation = useCallback((id: string) => {
-    setState(prev => {
-      const newConversations = prev.conversations.filter(c => c.id !== id);
+    setState((prev: ChatState) => {
+      const newConversations = prev.conversations.filter((c: Conversation) => c.id !== id);
       const newActiveId = prev.activeConversationId === id
         ? (newConversations.length > 0 ? newConversations[0].id : null)
         : prev.activeConversationId;
@@ -99,7 +119,7 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   // Load conversation
   const loadConversation = useCallback((id: string) => {
-    setState(prev => ({
+    setState((prev: ChatState) => ({
       ...prev,
       activeConversationId: id,
     }));
@@ -108,10 +128,10 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   // Add message to active conversation
   const addMessage = useCallback((message: Message) => {
-    setState(prev => {
+    setState((prev: ChatState) => {
       if (!prev.activeConversationId) return prev;
 
-      const newConversations = prev.conversations.map(conv => {
+      const newConversations = prev.conversations.map((conv: Conversation) => {
         if (conv.id === prev.activeConversationId) {
           const updatedMessages = [...conv.messages, message];
           const title = conv.messages.length === 0 && message.role === 'user'
@@ -137,10 +157,10 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   // Update last message (for streaming)
   const updateLastMessage = useCallback((content: string) => {
-    setState(prev => {
+    setState((prev: ChatState) => {
       if (!prev.activeConversationId) return prev;
 
-      const newConversations = prev.conversations.map(conv => {
+      const newConversations = prev.conversations.map((conv: Conversation) => {
         if (conv.id === prev.activeConversationId) {
           const messages = [...conv.messages];
           if (messages.length > 0) {
@@ -171,24 +191,24 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   // Set current model
   const setModel = useCallback((model: string) => {
-    setState(prev => ({ ...prev, currentModel: model }));
+    setState((prev: ChatState) => ({ ...prev, currentModel: model }));
     storage.saveCurrentModel(model);
   }, []);
 
   // Set system prompt
   const setSystemPrompt = useCallback((prompt: string) => {
-    setState(prev => ({ ...prev, systemPrompt: prompt }));
+    setState((prev: ChatState) => ({ ...prev, systemPrompt: prompt }));
     storage.saveSystemPrompt(prompt);
   }, []);
 
   // Set streaming state
   const setIsStreaming = useCallback((isStreaming: boolean) => {
-    setState(prev => ({ ...prev, isStreaming }));
+    setState((prev: ChatState) => ({ ...prev, isStreaming }));
   }, []);
 
   // Toggle sidebar
   const toggleSidebar = useCallback(() => {
-    setState(prev => {
+    setState((prev: ChatState) => {
       const newState = !prev.isSidebarOpen;
       storage.saveSidebarState(newState);
       return { ...prev, isSidebarOpen: newState };
@@ -197,7 +217,7 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   // Clear all conversations
   const clearAllConversations = useCallback(() => {
-    setState(prev => ({
+    setState((prev: ChatState) => ({
       ...prev,
       conversations: [],
       activeConversationId: null,
@@ -208,7 +228,7 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
   // Get active conversation
   const getActiveConversation = useCallback((): Conversation | null => {
     if (!state.activeConversationId) return null;
-    return state.conversations.find(c => c.id === state.activeConversationId) || null;
+    return state.conversations.find((c: Conversation) => c.id === state.activeConversationId) || null;
   }, [state.activeConversationId, state.conversations]);
 
   const value: ChatContextType = {
@@ -224,6 +244,35 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
     toggleSidebar,
     clearAllConversations,
     getActiveConversation,
+    setTheme: (theme: 'dark' | 'light') => {
+      setState((prev: ChatState) => ({ ...prev, theme }));
+      storage.saveTheme(theme);
+      if (typeof document !== 'undefined') {
+        document.documentElement.dataset.theme = theme;
+      }
+    },
+    setFontScale: (scale: number) => {
+      const clamped = Math.min(1.25, Math.max(0.85, scale));
+      setState((prev: ChatState) => ({ ...prev, fontScale: clamped }));
+      storage.saveFontScale(clamped);
+      if (typeof document !== 'undefined') {
+        document.documentElement.style.setProperty('--font-scale', String(clamped));
+      }
+    },
+    setMessageWidth: (width: number) => {
+      const clamped = Math.min(1000, Math.max(520, width));
+      setState((prev: ChatState) => ({ ...prev, messageWidth: clamped }));
+      storage.saveMessageWidth(clamped);
+    },
+    setSidebarWidth: (width: number) => {
+      const clamped = Math.min(500, Math.max(220, width));
+      setState((prev: ChatState) => ({ ...prev, sidebarWidth: clamped }));
+      storage.saveSidebarWidth(clamped);
+    },
+    setMessageDensity: (density: 'comfortable' | 'compact') => {
+      setState((prev: ChatState) => ({ ...prev, messageDensity: density }));
+      storage.saveMessageDensity(density);
+    },
   };
 
   return <ChatContext.Provider value={value}>{children}</ChatContext.Provider>;

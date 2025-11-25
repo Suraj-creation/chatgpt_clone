@@ -21,6 +21,12 @@ export interface ChatState {
   systemPrompt: string;
   isStreaming: boolean;
   isSidebarOpen: boolean;
+  // UI / Settings
+  theme: 'dark' | 'light';
+  fontScale: number; // 0.85 - 1.25
+  messageWidth: number; // px constraint for message bubbles
+  sidebarWidth: number; // adjustable sidebar width in px
+  messageDensity: 'comfortable' | 'compact';
 }
 
 // API Types
@@ -117,4 +123,9 @@ export const STORAGE_KEYS = {
   CURRENT_MODEL: 'gemini_chat_current_model',
   SYSTEM_PROMPT: 'gemini_chat_system_prompt',
   SIDEBAR_STATE: 'gemini_chat_sidebar_open',
+  THEME: 'gemini_chat_theme',
+  FONT_SCALE: 'gemini_chat_font_scale',
+  MESSAGE_WIDTH: 'gemini_chat_message_width',
+  SIDEBAR_WIDTH: 'gemini_chat_sidebar_width',
+  MESSAGE_DENSITY: 'gemini_chat_message_density',
 } as const;

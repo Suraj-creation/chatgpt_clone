@@ -1,9 +1,11 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useRef, useCallback } from 'react';
 import { SidebarProps, AVAILABLE_MODELS } from '@/lib/types';
 import { ConversationList } from './ConversationList';
 import { PlusCircle, Sparkles, Trash, Settings } from 'lucide-react';
+import { useChatContext } from '@/contexts/ChatContext';
+import { SettingsPanel } from './SettingsPanel';
 
 export const Sidebar: React.FC<SidebarProps> = ({
   conversations,
@@ -14,6 +16,32 @@ export const Sidebar: React.FC<SidebarProps> = ({
   onClearAll,
   isOpen,
 }) => {
+  const { sidebarWidth, setSidebarWidth } = useChatContext() as any;
+  const [showSettings, setShowSettings] = useState(false);
+  const isResizingRef = useRef(false);
+  const startXRef = useRef(0);
+  const startWidthRef = useRef(0);
+
+  const onMouseMove = useCallback((e: MouseEvent) => {
+    if (!isResizingRef.current) return;
+    const delta = e.clientX - startXRef.current;
+    setSidebarWidth(startWidthRef.current + delta);
+  }, [setSidebarWidth]);
+
+  const stopResize = useCallback(() => {
+    isResizingRef.current = false;
+    document.removeEventListener('mousemove', onMouseMove);
+    document.removeEventListener('mouseup', stopResize);
+  }, [onMouseMove]);
+
+  const startResize = (e: React.MouseEvent) => {
+    isResizingRef.current = true;
+    startXRef.current = e.clientX;
+    startWidthRef.current = sidebarWidth;
+    document.addEventListener('mousemove', onMouseMove);
+    document.addEventListener('mouseup', stopResize);
+  };
+
   return (
     <>
       {/* Overlay for mobile */}
@@ -26,7 +54,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
       {/* Sidebar */}
       <aside
-        className={`fixed lg:relative inset-y-0 left-0 z-50 w-80 bg-bg-secondary border-r border-border-subtle flex flex-col transition-transform duration-300 ${
+        style={{ width: sidebarWidth }}
+        className={`fixed lg:relative inset-y-0 left-0 z-50 bg-bg-secondary border-r border-border-subtle flex flex-col transition-transform duration-300 ${
           isOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
         }`}
       >
@@ -85,7 +114,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
             </button>
             
             <button
+              onClick={() => setShowSettings(true)}
               className="flex-1 flex items-center justify-center gap-2 px-3 py-2 bg-bg-tertiary hover:bg-bg-primary text-text-secondary hover:text-text-primary rounded-lg transition-all text-sm"
+              aria-label="Open interface settings"
             >
               <Settings className="w-4 h-4" />
               Settings
@@ -98,6 +129,16 @@ export const Sidebar: React.FC<SidebarProps> = ({
           </p>
         </div>
       </aside>
+      {/* Resize handle */}
+      {isOpen && (
+        <div
+          onMouseDown={startResize}
+          className="hidden lg:block absolute top-0 left-[var(--sidebar-right)] z-50 cursor-col-resize" 
+          style={{ left: sidebarWidth, width: 6, height: '100%', background: 'transparent' }}
+          aria-label="Resize sidebar"
+        />
+      )}
+      {showSettings && <SettingsPanel onClose={() => setShowSettings(false)} />}
     </>
   );
 };
