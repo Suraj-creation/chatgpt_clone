@@ -44,7 +44,7 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
     conversations: [],
     activeConversationId: null,
     currentModel: 'gemini-2.5-flash',
-    systemPrompt: 'You are a helpful AI assistant. Answer clearly and concisely.',
+    systemPrompt: 'You are an extremely helpful, knowledgeable, and comprehensive AI assistant. Provide detailed, well-structured responses with thorough explanations. Use proper formatting including headings, bullet points, numbered lists, bold text, and code blocks when appropriate. Be informative and aim to give complete answers that fully address the question.',
     isStreaming: false,
     isSidebarOpen: true,
     theme: 'dark',

@@ -1,7 +1,7 @@
 import { Conversation, STORAGE_KEYS } from './types';
 
 // Debounce utility
-let saveTimeout: NodeJS.Timeout | null = null;
+let saveTimeout: ReturnType<typeof setTimeout> | null = null;
 
 export const storage = {
   // Save conversations with debounce
@@ -86,10 +86,10 @@ export const storage = {
   loadSystemPrompt: (): string => {
     try {
       return localStorage.getItem(STORAGE_KEYS.SYSTEM_PROMPT) || 
-        'You are a helpful AI assistant. Answer clearly and concisely.';
+        'You are an extremely helpful, knowledgeable, and comprehensive AI assistant. Provide detailed, well-structured responses with thorough explanations. Use proper formatting including headings, bullet points, numbered lists, bold text, and code blocks when appropriate. Be informative and aim to give complete answers that fully address the question.';
     } catch (error) {
       console.error('Failed to load system prompt:', error);
-      return 'You are a helpful AI assistant. Answer clearly and concisely.';
+      return 'You are an extremely helpful, knowledgeable, and comprehensive AI assistant. Provide detailed, well-structured responses with thorough explanations. Use proper formatting including headings, bullet points, numbered lists, bold text, and code blocks when appropriate. Be informative and aim to give complete answers that fully address the question.';
     }
   },
 

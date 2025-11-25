@@ -87,7 +87,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Validate model name
+    // Validate model name - prioritize gemini-2.5-flash as in the HTML example
     const validModels = ['gemini-2.5-flash', 'gemini-1.5-pro-latest', 'gemini-pro'];
     const selectedModel = validModels.includes(model) ? model : 'gemini-2.5-flash';
     

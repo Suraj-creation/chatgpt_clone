@@ -7,7 +7,7 @@ import { ChevronDown, ChevronUp } from 'lucide-react';
 export const SystemPromptEditor: React.FC<SystemPromptEditorProps> = ({
   systemPrompt,
   onSystemPromptChange,
-}) => {
+}: SystemPromptEditorProps) => {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
@@ -28,7 +28,7 @@ export const SystemPromptEditor: React.FC<SystemPromptEditorProps> = ({
         <div className="px-4 pb-4 animate-fade-in">
           <textarea
             value={systemPrompt}
-            onChange={(e) => onSystemPromptChange(e.target.value)}
+            onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => onSystemPromptChange(e.target.value)}
             placeholder="Enter system instructions for the AI..."
             className="w-full bg-bg-tertiary text-text-primary px-3 py-2 rounded-lg border border-border-subtle focus:border-accent-blue focus:outline-none focus:ring-2 focus:ring-accent-blue/20 resize-none text-sm"
             rows={4}

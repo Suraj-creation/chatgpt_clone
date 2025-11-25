@@ -34,22 +34,28 @@ export default function Home() {
 
   const [abortController, setAbortController] = useState<AbortController | null>(null);
 
-  // Create initial conversation if none exists
+  // Create initial conversation if none exists - runs only once
   useEffect(() => {
-    if (conversations.length === 0) {
+    if (conversations.length === 0 && !activeConversationId) {
       createConversation();
     }
-  }, []);
+  }, [conversations.length, activeConversationId]);
 
   const handleSendMessage = async (content: string) => {
-    const activeConv = getActiveConversation();
+    let activeConv = getActiveConversation();
     
     // Create conversation if none exists
     if (!activeConv) {
       createConversation();
-      // Wait for next render to add message
-      setTimeout(() => handleSendMessage(content), 100);
-      return;
+      // Wait a bit for state to update, then try to get the conversation again
+      await new Promise(resolve => setTimeout(resolve, 50));
+      activeConv = getActiveConversation();
+      
+      // If still no conversation, something went wrong
+      if (!activeConv) {
+        console.error('Failed to create conversation');
+        return;
+      }
     }
 
     // Add user message
@@ -170,7 +176,7 @@ export default function Home() {
         <ChatHeader />
 
         {/* Messages */}
-        <div style={{ ['--message-width' as any]: messageWidth }} className="message-container w-full flex-1 flex flex-col">
+        <div style={{ ['--message-width' as any]: messageWidth }} className="message-container w-full flex-1 flex flex-col overflow-hidden">
           <MessageList />
         </div>
 

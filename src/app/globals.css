@@ -101,9 +101,15 @@ code {
   animation: slideIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* Prose styles for markdown */
+/* Prose styles for markdown - Enhanced */
 .prose {
   color: var(--text-primary);
+  font-feature-settings: 'kern' 1, 'liga' 1;
+  text-rendering: optimizeLegibility;
+}
+
+.formatted-response {
+  letter-spacing: 0.01em;
 }
 
 .prose :where(code):not(:where([class~="not-prose"] *)) {
@@ -114,12 +120,23 @@ code {
   font-size: calc(0.875em * var(--font-scale));
 }
 
+.inline-code {
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+  transition: all 0.2s ease;
+}
+
+.inline-code:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 6px rgba(59, 130, 246, 0.3);
+}
+
 .prose :where(pre):not(:where([class~="not-prose"] *)) {
   background-color: var(--bg-tertiary);
   border: 1px solid var(--border-subtle);
   border-radius: 0.5rem;
   padding: calc(1rem * var(--font-scale));
   overflow-x: auto;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
 }
 
 .prose :where(a):not(:where([class~="not-prose"] *)) {
@@ -132,18 +149,37 @@ code {
 }
 
 .prose :where(strong):not(:where([class~="not-prose"] *)) {
-  color: var(--text-primary);
-  font-weight: 600;
+  color: var(--accent-blue);
+  font-weight: 700;
+}
+
+.prose :where(em):not(:where([class~="not-prose"] *)) {
+  color: var(--accent-green);
+  font-style: italic;
+  font-weight: 500;
 }
 
 .prose :where(ul):not(:where([class~="not-prose"] *)) {
-  list-style-type: disc;
-  padding-left: 1.5rem;
+  list-style-type: none;
+  padding-left: 0;
 }
 
 .prose :where(ol):not(:where([class~="not-prose"] *)) {
-  list-style-type: decimal;
-  padding-left: 1.5rem;
+  list-style-type: none;
+  padding-left: 0;
+  counter-reset: item;
+}
+
+.prose :where(table):not(:where([class~="not-prose"] *)) {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.prose :where(blockquote):not(:where([class~="not-prose"] *)) {
+  border-left: 4px solid var(--accent-blue);
+  padding-left: 1rem;
+  font-style: italic;
+  color: var(--text-secondary);
 }
 
 /* Focus visible styles */
