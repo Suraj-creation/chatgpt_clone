@@ -2,21 +2,25 @@ import { NextRequest, NextResponse } from 'next/server';
 import { Message } from '@/lib/types';
 
 // Check both server-side and client-side environment variables
+// In Vercel, environment variables are available as process.env
 const GEMINI_API_KEY = 
   process.env.GEMINI_API_KEY || 
   process.env.NEXT_PUBLIC_GEMINI_API_KEY;
 
-// Log for debugging (remove sensitive info)
-console.log('🔍 Environment check:', {
+// Detailed logging for debugging
+console.log('🔍 Full environment check:', {
   hasGeminiKey: !!process.env.GEMINI_API_KEY,
   hasPublicKey: !!process.env.NEXT_PUBLIC_GEMINI_API_KEY,
+  geminiKeyLength: process.env.GEMINI_API_KEY?.length || 0,
   nodeEnv: process.env.NODE_ENV,
   vercelEnv: process.env.VERCEL_ENV,
+  allEnvKeys: Object.keys(process.env).sort(),
 });
 
 if (!GEMINI_API_KEY) {
-  console.error('⚠️ GEMINI_API_KEY is not set in environment variables');
-  console.error('📋 Available env vars:', Object.keys(process.env).filter(k => k.includes('GEMINI') || k.includes('API')));
+  console.error('❌ CRITICAL: GEMINI_API_KEY is not set in environment variables');
+  console.error('📋 All environment variable keys:', Object.keys(process.env).sort());
+  console.error('🔍 Gemini-related keys:', Object.keys(process.env).filter(k => k.toUpperCase().includes('GEMINI')));
 }
 
 interface RequestBody {
@@ -77,8 +81,18 @@ export async function POST(request: NextRequest) {
   try {
     // Check API key
     if (!GEMINI_API_KEY) {
+      console.error('❌ API route called without GEMINI_API_KEY');
       return NextResponse.json(
-        { success: false, error: 'GEMINI_API_KEY is not configured. Please add it to .env.local' },
+        { 
+          success: false, 
+          error: 'GEMINI_API_KEY is not configured. In Vercel Dashboard: Settings → Environment Variables → Add "GEMINI_API_KEY" then Redeploy',
+          debug: {
+            hasKey: !!process.env.GEMINI_API_KEY,
+            hasPublicKey: !!process.env.NEXT_PUBLIC_GEMINI_API_KEY,
+            vercelEnv: process.env.VERCEL_ENV || 'not-vercel',
+            nodeEnv: process.env.NODE_ENV
+          }
+        },
         { status: 500 }
       );
     }
