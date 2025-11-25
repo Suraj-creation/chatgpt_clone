@@ -6,6 +6,14 @@ const GEMINI_API_KEY =
   process.env.GEMINI_API_KEY || 
   process.env.NEXT_PUBLIC_GEMINI_API_KEY;
 
+// Log for debugging (remove sensitive info)
+console.log('🔍 Environment check:', {
+  hasGeminiKey: !!process.env.GEMINI_API_KEY,
+  hasPublicKey: !!process.env.NEXT_PUBLIC_GEMINI_API_KEY,
+  nodeEnv: process.env.NODE_ENV,
+  vercelEnv: process.env.VERCEL_ENV,
+});
+
 if (!GEMINI_API_KEY) {
   console.error('⚠️ GEMINI_API_KEY is not set in environment variables');
   console.error('📋 Available env vars:', Object.keys(process.env).filter(k => k.includes('GEMINI') || k.includes('API')));
